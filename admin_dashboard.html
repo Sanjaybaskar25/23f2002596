@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center mb-4">Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Revenue</h5>
+                <h2>₹{{ "%.2f"|format(stats.total_revenue) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Occupancy Rate</h5>
+                <h2>{{ "%.1f"|format(stats.occupancy_rate) }}%</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <h2>{{ stats.total_users }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Parking Lots</h5>
+        <div>
+            <a href="{{ url_for('admin.add_lot') }}" class="btn btn-success btn-sm">Add Lot</a>
+            <a href="{{ url_for('admin.view_users') }}" class="btn btn-secondary btn-sm">View Users</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Lot Name</th>
+                        <th>Price/hr</th>
+                        <th>Address</th>
+                        <th>Pin Code</th>
+                        <th>Total Slots</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lot in lots %}
+                    <tr>
+                        <td>{{ lot[0] }}</td>
+                        <td>{{ lot[1] }}</td>
+                        <td>₹{{ "%.2f"|format(lot[2]) }}</td>
+                        <td>{{ lot[3] }}</td>
+                        <td>{{ lot[4] }}</td>
+                        <td>{{ lot[5] }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.delete_lot', lot_id=lot[0]) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete {{ lot[1] }}?')">
+                               Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4 mb-md-0">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Recent Bookings</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Lot</th>
+                                <th>Time</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in stats.recent_bookings %}
+                            <tr>
+                                <td>{{ booking.username }}</td>
+                                <td>{{ booking.lot_name }}</td>
+                                <td>{{ booking.booked_time[-8:-3] }}</td> 
+                                <td>₹{{ "%.2f"|format(booking.amount_paid) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Revenue Overview</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ stats.revenue_labels|tojson }},
+            datasets: [{
+                label: 'Daily Revenue (₹)',
+                data: {{ stats.revenue_data|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + context.raw.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

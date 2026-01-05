@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center mb-4">Booking History</h2>
+
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h4 class="mb-0">Your Parking History</h4>
+    </div>
+    <div class="card-body">
+        {% if history %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Parking Lot</th>
+                        <th>Spot ID</th>
+                        <th>Booked Time</th>
+                        <th>Released Time</th>
+                        <th>Duration (hrs)</th>
+                        <th>Amount Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in history %}
+                    <tr>
+                        <td>{{ entry.lot_name }}</td>
+                        <td>{{ entry.spot_id }}</td>
+                        <td>{{ entry.booked_time }}</td>
+                        <td>{{ entry.released_time }}</td>
+                        <td>{{ "%.2f"|format(entry.duration) }}</td>
+                        <td>₹{{ "%.2f"|format(entry.amount_paid) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">No booking history found.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

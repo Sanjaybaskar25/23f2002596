@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h2 class="mb-0">Registered Users</h2>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Vehicle No</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[0] }}</td>
+                        <td>{{ user[1] }}</td>
+                        <td>{{ user[2] }}</td>
+                        <td>{{ user[3] }}</td>
+                        <td>{{ user[4] }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('admin.user_history', user_id=user[0]) }}" 
+                                   class="btn btn-info btn-sm">
+                                   History
+                                </a>
+                                <button class="btn btn-secondary btn-sm"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#userDetailModal"
+                                        data-userid="{{ user[0] }}"
+                                        data-username="{{ user[1] }}"
+                                        data-email="{{ user[2] }}"
+                                        data-phone="{{ user[3] }}"
+                                        data-vehicle="{{ user[4] }}"
+                                        data-address="{{ user[5] }}"
+                                        data-pincode="{{ user[6] }}">
+                                    Details
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Username:</label>
+                    <p class="form-control-plaintext" id="modal-username"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <p class="form-control-plaintext" id="modal-email"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone:</label>
+                    <p class="form-control-plaintext" id="modal-phone"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Vehicle No:</label>
+                    <p class="form-control-plaintext" id="modal-vehicle"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address:</label>
+                    <p class="form-control-plaintext" id="modal-address"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pincode:</label>
+                    <p class="form-control-plaintext" id="modal-pincode"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('userDetailModal');
+    modal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        document.getElementById('modal-username').textContent = button.getAttribute('data-username');
+        document.getElementById('modal-email').textContent = button.getAttribute('data-email');
+        document.getElementById('modal-phone').textContent = button.getAttribute('data-phone');
+        document.getElementById('modal-vehicle').textContent = button.getAttribute('data-vehicle');
+        document.getElementById('modal-address').textContent = button.getAttribute('data-address');
+        document.getElementById('modal-pincode').textContent = button.getAttribute('data-pincode');
+    });
+});
+</script>
+{% endblock %}
